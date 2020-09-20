@@ -268,6 +268,9 @@ func StructToMap(filter FieldFilter, src interface{}, dst map[string]interface{}
 			// Check if it is a slice of primitive values.
 			itemKind := srcField.Type().Elem().Kind()
 			if itemKind != reflect.Ptr && itemKind != reflect.Struct && itemKind != reflect.Interface {
+				if !srcField.CanInterface() {
+					continue
+				}
 				// Handle this array/slice as a regular non-nested data structure: copy it entirely to dst.
 				dst[dstName] = srcField.Interface()
 				continue
@@ -315,6 +318,9 @@ func StructToMap(filter FieldFilter, src interface{}, dst map[string]interface{}
 			dst[dstName] = newValue
 
 		case reflect.Struct:
+			if !srcField.CanInterface() {
+				continue
+			}
 			var newValue map[string]interface{}
 			existingValue, ok := dst[dstName]
 			if ok {
@@ -328,6 +334,9 @@ func StructToMap(filter FieldFilter, src interface{}, dst map[string]interface{}
 			dst[dstName] = newValue
 
 		default:
+			if !srcField.CanInterface() {
+				continue
+			}
 			// Set a value on a map.
 			dst[dstName] = srcField.Interface()
 		}
